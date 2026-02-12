@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>A Story of Us | Aamena & Hussain</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@200;300;400;600&display=swap");
+
+      :root {
+        --obsidian: #0a0a0a;
+        --crimson: #e11d48;
+        --champagne: #f7e7ce;
+        --rose-dust: #9e7676;
+      }
+
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--obsidian);
+        color: var(--champagne);
+        font-family: "Inter", sans-serif;
+        overflow: hidden;
+        user-select: none;
+      }
+
+      .serif {
+        font-family: "Playfair Display", serif;
+      }
+
+      canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      /* Screen Transitions */
+      .screen {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+        padding: 20px;
+        transition: opacity 1s ease-in-out;
+        background: radial-gradient(
+          circle at center,
+          rgba(225, 29, 72, 0.05) 0%,
+          transparent 70%
+        );
+      }
+
+      .screen.active {
+        display: flex;
+        opacity: 1;
+        animation: fadeIn 1.5s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* UI Elements */
+      .glass {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(247, 231, 206, 0.1);
+        border-radius: 24px;
+      }
+
+      .btn-gold {
+        background: var(--champagne);
+        color: var(--obsidian);
+        padding: 14px 32px;
+        border-radius: 40px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        text-transform: uppercase;
+        font-size: 12px;
+      }
+
+      .btn-gold:active {
+        transform: scale(0.95);
+      }
+
+      .letter-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+      }
+
+      .note-card {
+        aspect-ratio: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      .note-card:hover {
+        transform: translateY(-5px);
+        filter: drop-shadow(0 0 10px var(--crimson));
+      }
+
+      .photo-strip {
+        display: flex;
+        overflow-x: auto;
+        gap: 15px;
+        width: 100%;
+        padding: 20px;
+      }
+
+      .photo-card {
+        flex: 0 0 240px;
+        height: 320px;
+        border-radius: 20px;
+        overflow: hidden;
+        position: relative;
+        background: #1a1a1a;
+        border: 1px solid rgba(247, 231, 206, 0.1);
+      }
+
+      .photo-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.7;
+        transition: 0.5s;
+      }
+
+      .photo-card:hover img {
+        opacity: 1;
+        transform: scale(1.05);
+      }
+
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+
+      #no-button {
+        transition: all 0.2s ease;
+      }
+
+      .scroll-text {
+        max-height: 40vh;
+        overflow-y: auto;
+        text-align: left;
+        padding: 10px;
+        font-size: 15px;
+        line-height: 1.8;
+        opacity: 0.8;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="mainCanvas"></canvas>
+
+    <!-- Background Music -->
+    <audio id="loveSong" loop>
+      <source
+        src="https://www.chosic.com/wp-content/uploads/2021/07/Rainy-Day.mp3"
+        type="audio/mpeg"
+      />
+    </audio>
+
+    <!-- SCREEN 1: THE SEAL -->
+    <div id="screen1" class="screen active">
+      <div class="text-center">
+        <div class="mb-10 animate-pulse">
+          <div
+            class="w-24 h-24 mx-auto rounded-full border-2 border-rose-900 flex items-center justify-center p-4"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor" class="text-rose-600">
+              <path
+                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+              />
+            </svg>
+          </div>
+        </div>
+        <h1 class="serif text-4xl mb-2 italic">A Gift for Aamena</h1>
+        <p class="text-[10px] tracking-[0.5em] opacity-40 uppercase mb-12">
+          Private & Confidential
+        </p>
+        <button onclick="nextScreen(1, 2)" class="btn-gold">
+          Open the Letter
+        </button>
+      </div>
+    </div>
+
+    <!-- SCREEN 2: THE INTRO -->
+    <div id="screen2" class="screen">
+      <div class="max-w-xs text-center">
+        <p class="serif text-2xl italic leading-relaxed mb-10">
+          "In the quiet moments between breaths, I found a love that changed my
+          world forever."
+        </p>
+        <button
+          onclick="nextScreen(2, 3)"
+          class="text-xs tracking-widest opacity-60 underline underline-offset-8 uppercase"
+        >
+          Start the Story
+        </button>
+      </div>
+    </div>
+
+    <!-- SCREEN 3: THE DASHBOARD -->
+    <div id="screen3" class="screen">
+      <div class="w-full max-w-sm flex flex-col items-center">
+        <div class="text-center mb-8">
+          <h2 class="serif text-3xl italic text-rose-300">Hussain & Aamena</h2>
+          <p class="text-[9px] tracking-[0.3em] opacity-40 uppercase">
+            A Love Calculated in Seconds
+          </p>
+        </div>
+
+        <div class="glass p-8 w-full mb-8">
+          <div id="counter" class="grid grid-cols-4 gap-2 text-center">
+            <div>
+              <span id="days" class="text-3xl font-light">00</span><br /><span
+                class="text-[7px] opacity-40"
+                >DAYS</span
+              >
+            </div>
+            <div>
+              <span id="hours" class="text-3xl font-light">00</span><br /><span
+                class="text-[7px] opacity-40"
+                >HRS</span
+              >
+            </div>
+            <div>
+              <span id="mins" class="text-3xl font-light">00</span><br /><span
+                class="text-[7px] opacity-40"
+                >MINS</span
+              >
+            </div>
+            <div>
+              <span id="secs" class="text-3xl font-light">00</span><br /><span
+                class="text-[7px] opacity-40"
+                >SECS</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <p class="text-[10px] italic opacity-50 mb-10">
+          "Every moment since Feb 11, 2026, has been magic."
+        </p>
+
+        <button onclick="nextScreen(3, 4)" class="btn-gold">
+          View Memory Lane
+        </button>
+      </div>
+    </div>
+
+    <!-- SCREEN 4: MEMORY LANE (GALLERY) -->
+    <div id="screen4" class="screen">
+      <div class="w-full text-center">
+        <h2 class="serif text-3xl italic mb-6">Memory Lane</h2>
+        <div class="photo-strip no-scrollbar">
+          <!-- User should replace these URLs with actual photos -->
+          <div class="photo-card">
+            <img
+              src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=600"
+              alt="Moment 1"
+            />
+          </div>
+          <div class="photo-card">
+            <img
+              src="https://images.unsplash.com/photo-1522673607200-1648832cee98?q=80&w=600"
+              alt="Moment 2"
+            />
+          </div>
+          <div class="photo-card">
+            <img
+              src="https://images.unsplash.com/photo-1494774157365-9e04c6720e47?q=80&w=600"
+              alt="Moment 3"
+            />
+          </div>
+        </div>
+        <p class="text-[10px] opacity-40 mt-6 uppercase tracking-widest">
+          Swipe to browse our world
+        </p>
+        <button onclick="nextScreen(4, 5)" class="btn-gold mt-10">
+          Read My Notes
+        </button>
+      </div>
+    </div>
+
+    <!-- SCREEN 5: THE INTERACTIVE NOTES -->
+    <div id="screen5" class="screen">
+      <div class="w-full max-w-sm text-center">
+        <h2 class="serif text-3xl italic mb-8">Secret Love Notes</h2>
+        <p class="text-[9px] tracking-widest opacity-30 uppercase mb-6">
+          Tap a heart to uncover a truth
+        </p>
+        <div class="letter-grid mb-12">
+          <div
+            onclick="showNote('You are the poem I never knew how to write.')"
+            class="note-card glass"
+          >
+            ❤️
+          </div>
+          <div
+            onclick="showNote('Every laugh with you is my favorite song.')"
+            class="note-card glass"
+          >
+            💖
+          </div>
+          <div
+            onclick="showNote('Hussain + Aamena = Infinity.')"
+            class="note-card glass"
+          >
+            ✨
+          </div>
+          <div
+            onclick="showNote('You make the world feel safe, Aamena.')"
+            class="note-card glass"
+          >
+            🌹
+          </div>
+          <div
+            onclick="showNote('I promise to choose you, every single day.')"
+            class="note-card glass"
+          >
+            💍
+          </div>
+          <div
+            onclick="showNote('My heart found its true home in your eyes.')"
+            class="note-card glass"
+          >
+            🏠
+          </div>
+        </div>
+        <button onclick="nextScreen(5, 6)" class="btn-gold">
+          A Soulful Letter
+        </button>
+      </div>
+    </div>
+
+    <!-- SCREEN 6: THE SOULFUL LETTER -->
+    <div id="screen6" class="screen">
+      <div class="glass p-8 mx-6 max-w-md">
+        <h2 class="serif text-2xl mb-4 italic text-rose-300">Dear Aamena...</h2>
+        <div class="scroll-text no-scrollbar serif italic">
+          There are things that words struggle to carry. Like the way the light
+          hits your eyes, or how my soul feels finally at peace when I'm with
+          you. Since that morning in February, time hasn't just passed; it has
+          been enriched. Every day is a melody of your laughter and my devotion.
+          <br /><br />
+          You aren't just my partner, you are my sanctuary. As you read this,
+          know that Hussain's heart belongs to no one but you, now and in every
+          lifetime that follows.
+        </div>
+        <button onclick="nextScreen(6, 7)" class="btn-gold mt-8 w-full">
+          One Last Thing
+        </button>
+      </div>
+    </div>
+
+    <!-- SCREEN 7: THE FINAL QUESTION -->
+    <div id="screen7" class="screen">
+      <div class="text-center glass p-10 mx-6">
+        <h3 class="serif text-3xl mb-6">Aamena,</h3>
+        <p class="text-rose-200 mb-10 leading-relaxed italic">
+          Will you be my Valentine, my partner, and my always?
+        </p>
+
+        <div class="flex flex-col gap-4 relative h-32 items-center">
+          <button
+            id="yes-button"
+            onclick="celebrate()"
+            class="w-full py-4 bg-rose-600 rounded-full font-bold shadow-xl shadow-rose-900/40"
+          >
+            YES, FOREVER
+          </button>
+          <button
+            id="no-button"
+            onmouseover="dodge()"
+            onclick="dodge()"
+            class="w-32 py-2 bg-white/5 border border-white/10 rounded-full text-xs opacity-40"
+          >
+            Not really
+          </button>
+        </div>
+
+        <div id="final-words" class="hidden mt-8 space-y-2 animate-fade-in">
+          <p class="serif text-3xl text-rose-400">Yours, Forever.</p>
+          <p class="text-[10px] opacity-40 uppercase tracking-widest mt-4">
+            Hussain ❤️ Aamena
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overlay Note Modal -->
+    <div
+      id="noteModal"
+      onclick="this.style.display = 'none'"
+      class="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-10 text-center"
+      style="display: none"
+    >
+      <div class="glass p-10 max-w-xs border-rose-900/50">
+        <p
+          id="noteContent"
+          class="serif text-xl italic leading-relaxed text-rose-100"
+        ></p>
+        <p class="mt-8 text-[8px] tracking-[0.5em] opacity-40 uppercase">
+          Tap to close
+        </p>
+      </div>
+    </div>
+
+    <script>
+      /** CANVAS ENGINE **/
+      const canvas = document.getElementById("mainCanvas");
+      const ctx = canvas.getContext("2d");
+      let particles = [];
+      let mouse = { x: -100, y: -100 };
+
+      function initCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+
+      class Petal {
+        constructor() {
+          this.reset();
+        }
+        reset() {
+          this.x = Math.random() * canvas.width;
+          this.y = -20;
+          this.size = Math.random() * 4 + 2;
+          this.speedX = Math.random() * 1 - 0.5;
+          this.speedY = Math.random() * 1 + 0.5;
+          this.opacity = Math.random() * 0.4 + 0.1;
+          this.rot = Math.random() * 360;
+          this.rotS = Math.random() * 2 - 1;
+        }
+        update() {
+          this.y += this.speedY;
+          this.x += this.speedX;
+          this.rot += this.rotS;
+          if (this.y > canvas.height) this.reset();
+        }
+        draw() {
+          ctx.save();
+          ctx.translate(this.x, this.y);
+          ctx.rotate((this.rot * Math.PI) / 180);
+          ctx.fillStyle = `rgba(225, 29, 72, ${this.opacity})`;
+          ctx.beginPath();
+          ctx.ellipse(0, 0, this.size, this.size * 1.5, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      for (let i = 0; i < 60; i++) particles.push(new Petal());
+
+      function animate() {
+        ctx.fillStyle = "rgba(10, 10, 10, 0.2)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        particles.forEach((p) => {
+          p.update();
+          p.draw();
+        });
+
+        ctx.beginPath();
+        let g = ctx.createRadialGradient(
+          mouse.x,
+          mouse.y,
+          0,
+          mouse.x,
+          mouse.y,
+          120,
+        );
+        g.addColorStop(0, "rgba(225, 29, 72, 0.1)");
+        g.addColorStop(1, "transparent");
+        ctx.fillStyle = g;
+        ctx.arc(mouse.x, mouse.y, 120, 0, Math.PI * 2);
+        ctx.fill();
+        requestAnimationFrame(animate);
+      }
+
+      window.addEventListener("mousemove", (e) => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+      });
+      window.addEventListener("touchstart", (e) => {
+        mouse.x = e.touches[0].clientX;
+        mouse.y = e.touches[0].clientY;
+        document
+          .getElementById("loveSong")
+          .play()
+          .catch(() => {});
+      });
+      window.addEventListener("resize", initCanvas);
+      initCanvas();
+      animate();
+
+      /** NAVIGATION **/
+      function nextScreen(current, next) {
+        document.getElementById(`screen${current}`).classList.remove("active");
+        setTimeout(() => {
+          document.getElementById(`screen${current}`).style.display = "none";
+          const nextScr = document.getElementById(`screen${next}`);
+          nextScr.style.display = "flex";
+          setTimeout(() => nextScr.classList.add("active"), 50);
+        }, 800);
+        if (current === 1) document.getElementById("loveSong").play();
+      }
+
+      function showNote(text) {
+        document.getElementById("noteContent").innerText = text;
+        document.getElementById("noteModal").style.display = "flex";
+      }
+
+      /** TIMER **/
+      const startDate = new Date("2026-02-11T09:52:00");
+      function updateTimer() {
+        const now = new Date();
+        const diff = now - startDate;
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const m = Math.floor((diff / 1000 / 60) % 60);
+        const s = Math.floor((diff / 1000) % 60);
+        document.getElementById("days").innerText = d
+          .toString()
+          .padStart(2, "0");
+        document.getElementById("hours").innerText = h
+          .toString()
+          .padStart(2, "0");
+        document.getElementById("mins").innerText = m
+          .toString()
+          .padStart(2, "0");
+        document.getElementById("secs").innerText = s
+          .toString()
+          .padStart(2, "0");
+      }
+      setInterval(updateTimer, 1000);
+      updateTimer();
+
+      /** DODGE **/
+      const noBtn = document.getElementById("no-button");
+      const yesBtn = document.getElementById("yes-button");
+      let yesScale = 1;
+
+      function dodge() {
+        const x = Math.random() * (window.innerWidth - 100);
+        const y = Math.random() * (window.innerHeight - 100);
+        noBtn.style.position = "fixed";
+        noBtn.style.left = `${x}px`;
+        noBtn.style.top = `${y}px`;
+        noBtn.style.zIndex = "1000";
+        yesScale += 0.2;
+        yesBtn.style.transform = `scale(${yesScale})`;
+      }
+
+      function celebrate() {
+        confetti({
+          particleCount: 200,
+          spread: 80,
+          origin: { y: 0.6 },
+          colors: ["#e11d48", "#f7e7ce", "#ffffff"],
+        });
+        noBtn.style.display = "none";
+        document.getElementById("final-words").classList.remove("hidden");
+        yesBtn.innerText = "I AM YOURS";
+        yesBtn.disabled = true;
+      }
+    </script>
+  </body>
+</html>
